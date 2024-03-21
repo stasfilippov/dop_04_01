@@ -3,6 +3,7 @@ import {_ErrorType, decksAPI, ErrorType, UpdateDeckParams} from './decks-api.ts'
 import { addDeckAC, deleteDeckAC, setDecksAC, updateDeckAC } from './decks-reducer.ts'
 import {setAppError, setAppStatus} from '../../app/app-reducer.ts';
 import axios from 'axios';
+import {handleNetworkError} from '../../common/utils/handle-error.ts';
 
 export const fetchDecksTC = () => async (dispatch: Dispatch) => {
   dispatch(setAppStatus('loading'))
@@ -35,19 +36,21 @@ export const deleteDeckTC = (id: string) => async (dispatch: Dispatch) => {
 
 export const updateDeckTC = (params: UpdateDeckParams) => async (dispatch: Dispatch) => {
   try {
-    throw new Error ('helloooo!')
+    throw new Error ('BOOOOM!')
+    dispatch(setAppStatus('loading'))
     const res = await decksAPI.updateDeck(params)
     dispatch(updateDeckAC(res.data))
+    dispatch(setAppStatus('succeeded'))
   } catch (e) {
     if (axios.isAxiosError(e)) {
       if (e.response) {
-        console.log(e.response.data.errorMessages[0].message)
+        handleNetworkError(dispatch, e.response.data.errorMessages[0].message)
       } else {
-        console.log(e.message)
+        handleNetworkError(dispatch, e.message)
       }
     } else {
       if (e instanceof Error) {
-        console.log(e.message)
+        handleNetworkError(dispatch, e.message)
       }
     }
   }
