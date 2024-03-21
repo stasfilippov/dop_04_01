@@ -34,7 +34,22 @@ export const deleteDeckTC = (id: string) => async (dispatch: Dispatch) => {
 }
 
 export const updateDeckTC = (params: UpdateDeckParams) => async (dispatch: Dispatch) => {
-  return decksAPI.updateDeck(params).then((res) => {
+  try {
+    throw new Error ('helloooo!')
+    const res = await decksAPI.updateDeck(params)
     dispatch(updateDeckAC(res.data))
-  })
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      if (e.response) {
+        console.log(e.response.data.errorMessages[0].message)
+      } else {
+        console.log(e.message)
+      }
+    } else {
+      if (e instanceof Error) {
+        console.log(e.message)
+      }
+    }
+  }
+
 }
